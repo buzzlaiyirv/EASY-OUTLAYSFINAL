@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Links -->
+    
+    <link rel="stylesheet" href="/cssEasy/style.css">
+    <script src="https://kit.fontawesome.com/1cf0fc1f6f.js" crossorigin="anonymous"></script>
+    <title>EASY OUTLAYS</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark nav-bg">
+        <div class="container-fluid">
+            <i class="fas fa-wallet text-white fs-1 me-2"></i>
+            <a class="navbar-brand text-white fs-1" href="#">EASY OUTLAYS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" aria-current="page" href="/balance"><i
+                                class="fas fa-chart-line me-2"></i>Balance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" href="/categorias"><i
+                                class="fas fa-tag me-2"></i>Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" href="/reporte"><i
+                                class="fas fa-chart-pie me-2"></i>Reporte</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section id="newOp" class="">
+        <div class="container col-lg-6 col-11 bg-light border border-3 rounded-3 mt-5">
+            <h2 class="mt-3">Editar Operación</h2>
+            <form id="newOp-form" action="/update-operation" method="POST">
+                <div class="my-3">
+                    <label class="label fw-bold">Descripción:</label>
+                    <div class="input-group input-group-sm">
+                        <input id="new-description" name="descripcion" type="text" class="form-control" value="<%= operacion.desc_g || operacion.desc_in %>" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                    </div>
+                </div>
+                <div class="my-3">
+                    <label class="label fw-bold">Monto:</label>
+                    <div class="input-group input-group-sm">
+                        <input id="new-amount" name="monto" type="text" class="form-control" value="<%= operacion.cant_g || operacion.cant_in %>" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="label fw-bold">Tipo:</label>
+                    <select id="newOp-type" name="tipo" required class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <option value="Nada">---</option>
+                        <option value="Gasto" <%= tipo === 'Gasto' ? 'selected' : '' %>>Gasto</option>
+                        <option value="Ingreso" <%= tipo === 'Ingreso' ? 'selected' : '' %>>Ingreso</option>
+                    </select>
+                </div>
+    
+                <div id="tipoIngreso" class="mt-3 <%= tipo === 'Ingreso' ? '' : 'd-none' %>">
+                    <label class="label fw-bold">Tipo de Ingreso:</label>
+                    <select id="newOp-ingreso" name="tipoGI" required class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <% tiposIngresos.forEach(tipo => { %>
+                            <option value="<%= tipo.desc_tI %>" <%= operacion.desc_tI === tipo.desc_tI ? 'selected' : '' %>><%= tipo.desc_tI %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                
+                <div id="tipoGasto" class="mt-3 <%= tipo === 'Gasto' ? '' : 'd-none' %>">
+                    <label class="label fw-bold">Tipo de Gasto:</label>
+                    <select id="newOp-gasto" name="tipoGI" required class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <% tiposGastos.forEach(tipo => { %>
+                            <option value="<%= tipo.desc_tG %>" <%= operacion.desc_tG === tipo.desc_tG ? 'selected' : '' %>><%= tipo.desc_tG %></option>
+                        <% }); %>
+                    </select>
+                </div>
+    
+                <div class="mt-3">
+                    <label class="label fw-bold">Categoria:</label>
+                    <select id="newOp-category" name="categoria" required class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <% categorias.forEach(categoria => { %>
+                            <option value="<%= categoria.nombre_catG %>" <%= operacion.nombre_catG === categoria.nombre_catG ? 'selected' : '' %>><%= categoria.nombre_catG %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="mt-3">
+                    <label class="label fw-bold">Fecha:</label>
+                    <input id="newOp-date" name="fecha" required type="date" class="input-group form-control" value="<%= operacion.fecha_g || operacion.fecha_in %>" min="1980-01-01" max="2025-12-31">
+                </div>
+                <div class="mt-5 mb-3 d-flex justify-content-end">
+                    <a href="/balance"><button id="newOp-cancelbtn" type="button" class="btn btn-bg-color-light me-3">Cancelar</button></a>
+                    <button id="submit-newOp" type="submit" class="btn btn-bg-color fw-bold">Editar</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script>
+    document.getElementById('newOp-amount').addEventListener('keydown', function(event) {
+        var codigoTecla = event.which ? event.which : event.keyCode;
+        if (codigoTecla == 8 || codigoTecla == 9 || codigoTecla == 37 || codigoTecla == 39) {
+            return true;
+        }
+        var caracter = String.fromCharCode(codigoTecla);
+        if (!/^\d+$/.test(caracter)) {
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    });
+    
+    document.getElementById('newOp-description').addEventListener('input', function() {
+        if (this.value.length > 30) {
+            this.value = this.value.slice(0, 30);
+        }
+    });
+    
+    document.getElementById('newOp-date').addEventListener('input', function(event) {
+        var fechaIngresada = new Date(this.value);
+        var añoMinimo = 1980;
+        var añoMaximo = 2025;
+        if (fechaIngresada.getFullYear() < añoMinimo || fechaIngresada.getFullYear() > añoMaximo) {
+            this.setCustomValidity("La fecha debe estar entre 1980 y 2025");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
+    
+    document.getElementById('newOp-type').addEventListener('change', function() {
+        const tipoSeleccionado = this.value;
+        document.getElementById('tipoGasto').classList.add('d-none');
+        document.getElementById('tipoIngreso').classList.add('d-none');
+        if (tipoSeleccionado === 'Gasto') {
+            document.getElementById('tipoGasto').classList.remove('d-none');
+        } else if (tipoSeleccionado === 'Ingreso') {
+            document.getElementById('tipoIngreso').classList.remove('d-none');
+        }
+    });
+    </script>
+
+  <!---------------------EDITAR OPERACIONES EN SUS TABLAS CORRESPONDIENTES---------------------------------------------------------> 
+    <script>
+      
+
+
+        document.getElementById('newOp-type').addEventListener('change', function() {
+         const tipoSeleccionado = this.value;
+    
+         // Ocultar ambos selectores de tipo
+          document.getElementById('tipoGasto').classList.add('d-none');
+         document.getElementById('tipoIngreso').classList.add('d-none');
+    
+    // Mostrar el selector correspondiente según la selección del usuario
+         if (tipoSeleccionado === 'Gasto') {
+          document.getElementById('tipoGasto').classList.remove('d-none');
+        } else{
+          document.getElementById('tipoIngreso').classList.remove('d-none');
+         }
+        });
+    </script>
+
+
+    <script>
+        document.getElementById('newOp-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const descripcion = document.getElementById('new-description').value;
+    const monto = document.getElementById('new-amount').value;
+    const tipo = document.getElementById('newOp-type').value;
+    const categoria = document.getElementById('newOp-category').value;
+    const fecha = document.getElementById('newOp-date').value;
+
+    let tipoGI;
+    if (tipo === 'Gasto') {
+        tipoGI = document.getElementById('newOp-gasto').value;
+    } else {
+        tipoGI = document.getElementById('newOp-ingreso').value;
+    }
+
+    if (tipo === 'Nada') {
+        alert('Por favor seleccione un tipo válido.');
+        return;
+    }
+
+    const data = {
+        descripcion,
+        monto,
+        tipo,
+        categoria,
+        fecha,
+        tipoGI
+    };
+
+    fetch('/update-operation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Operación actualizada exitosamente.');
+            window.location.href = '/balance'; // Redirigir al balance después de actualizar
+        } else {
+            alert('Error al actualizar la operación.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar la operación.');
+    });
+});
+
+    </script>
+</body>
+</html>

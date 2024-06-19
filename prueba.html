@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+   
+    <link rel="stylesheet" href="/cssEasy/style.css">
+    <script src="https://kit.fontawesome.com/1cf0fc1f6f.js" crossorigin="anonymous"></script>
+
+
+    <title>EASY OUTLAYS</title>
+</head>
+
+<body>
+    <div class="hm-wrapper">
+    <nav class="navbar navbar-expand-lg navbar-dark nav-bg">
+        <div class="container-fluid">
+            <i class="fas fa-wallet text-white fs-1 me-2"></i>
+            <a class="navbar-brand text-white fs-1" href="#">EASY OUTLAYS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" aria-current="page" href="/balance"><i
+                                class="fas fa-chart-line me-2"></i>Balance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" href="/categorias"><i
+                                class="fas fa-tag me-2"></i>Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" href="/reporte"><i
+                                class="fas fa-chart-pie me-2"></i>Reporte</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+<main id="main" class="">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <div class="bg-light border border-3 rounded-3">
+                    <div class="container mt-2">
+                        <h4 class="fw-bolder">Balance</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <h5>Ganancia</h5>
+                            </div>
+                            <div class="col-6">
+                                <p id="gain-counter" class="text-success d-flex justify-content-end">+$<span>0</span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <h5>Gasto</h5>
+                            </div>
+                            <div class="col-6">
+                                <p id="loss-counter" class="text-danger d-flex justify-content-end">-$<span>0</span></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <h5>Total</h5>
+                            </div>
+                            <div class="col-6">
+                                <p id="final-amount" class="fw-bolder d-flex justify-content-end">$<span>0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="container col-12 col-lg-8">
+                <div class="bg-light border border-3 rounded-3 mt-lg-0 mt-3 mb-3">
+                    <div class="container mt-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <h4 class="fw-bolder">Operaciones</h4>
+                            </div>
+                            <div class="col-6 d-flex justify-content-end">
+                                <a href="/operaciones"><button type="button" class="btn btn-bg-color">+ Nueva operación</button></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container d-flex flex-column pb-3">
+                        <!-- Cuando No hay operaciones -->
+                        <div id="empty-ops" class="<%= (ingresos.length === 0 && gastos.length === 0) ? '' : 'd-none' %>">
+                            <div class="container d-flex justify-content-center align-items-center mt-5">
+                            </div>
+                            <div class="container d-flex justify-content-center align-items-center mt-5">
+                                <h5>Sin resultados</h5>
+                            </div>
+                            <div class="container d-flex justify-content-center align-items-center mt-2">
+                                <p>Cambia los filtros o agrega operaciones</p>
+                            </div>
+                        </div>
+                        <!-- Cuando se agregan operaciones -->
+                        <div id="loaded-ops" class="<%= (ingresos.length > 0 || gastos.length > 0) ? '' : 'd-none' %>">
+                            <div class="d-none d-md-flex row mt-3">
+                                <div class="col-3">
+                                    <p class="fw-bold">Descripción</p>
+                                </div>
+                                <div class="col-3">
+                                    <p class="fw-bold">Categoría</p>
+                                </div>
+                                <div class="col-2">
+                                    <p class="fw-bold">Fecha</p>
+                                </div>
+                                <div class="col-2">
+                                    <p class="fw-bold text-center">Monto</p>
+                                </div>
+                            </div>
+                            <!-- OPERATION ROW -->
+                            <div id="operation-row-grid">
+                                <% ingresos.forEach(function(ingreso) { %>
+                                <div class="row mt-1">
+                                    <div class="col-3">
+                                        <p><%= ingreso.desc_in %></p>
+                                    </div>
+                                    <div class="col-3">
+                                        <p><%= ingreso.nombre_catG %></p>
+                                    </div>
+                                    <div class="col-2">
+                                        <p><%= ingreso.fecha_in %></p>
+                                    </div>
+                                    <div class="col-2 text-center text-success">
+                                        <p>+$<%= ingreso.cant_in %></p>
+                                    </div>
+                                </div>
+                                <% }); %>
+                                <% gastos.forEach(function(gasto) { %>
+                                <div class="row mt-1">
+                                    <div class="col-3">
+                                        <p><%= gasto.desc_g %></p>
+                                    </div>
+                                    <div class="col-3">
+                                        <p><%= gasto.nombre_catG %></p>
+                                    </div>
+                                    <div class="col-2">
+                                        <p><%= gasto.fecha_g %></p>
+                                    </div>
+                                    <div class="col-2 text-center text-danger">
+                                        <p>-$<%= gasto.cant_g %></p>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script> 
+
+var input = document.getElementById("newOp-amount");
+
+// Agregar un escuchador de eventos para el evento 'keydown'
+input.addEventListener("keydown", function(event) {
+// Obtener el código de la tecla presionada
+var codigoTecla = event.which ? event.which : event.keyCode;
+
+// Permitir teclas especiales como la flecha arriba, abajo, etc.
+if (codigoTecla == 8 || codigoTecla == 9 || codigoTecla == 37 || codigoTecla == 39) {
+    return true;
+}
+
+// Convertir el código de tecla a un carácter
+var caracter = String.fromCharCode(codigoTecla);
+
+// Verificar si el carácter es un número o un punto (.)
+if (!/^[0-9.]$/.test(caracter)) {
+    event.preventDefault(); // Detener la acción predeterminada si no es un número o punto
+    return false;
+}
+
+// Permitir solo un punto (.) en el input
+if (caracter === '.' && input.value.includes('.')) {
+    event.preventDefault(); // Si ya hay un punto, prevenir la entrada
+    return false;
+}
+
+return true;
+});
+
+
+document.getElementById('newOp-description').addEventListener('input', function() {
+if (this.value.length > 30) {
+    this.value = this.value.slice(0, 30); // Limitar la longitud a 30 caracteres
+}
+});
+
+
+var inputFecha = document.getElementById("newOp-date");
+
+// Agregar un escuchador de eventos para el evento 'input'
+inputFecha.addEventListener("input", function(event) {
+// Obtener la fecha ingresada
+var fechaIngresada = new Date(inputFecha.value);
+
+// Verificar si la fecha está dentro del rango especificado (1980 - 2025)
+var añoMinimo = 1980;
+var añoMaximo = 2025;
+if (fechaIngresada.getFullYear() < añoMinimo || fechaIngresada.getFullYear() > añoMaximo) {
+    // Mostrar un mensaje de error o tomar alguna acción adicional, por ejemplo:
+    inputFecha.setCustomValidity("La fecha debe estar entre 1980 y 2025");
+} else {
+    // La fecha está dentro del rango, por lo que no hay error
+    inputFecha.setCustomValidity("");
+}
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+// Obtener las categorías del Local Storage
+let categories = JSON.parse(localStorage.getItem('categories')) || [];
+
+// Obtener el elemento select
+let selectElement = document.getElementById('newOp-category');
+
+// Agregar las opciones al select
+categories.forEach(function (category) {
+    let option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    selectElement.appendChild(option);
+});
+});
+
+
+document.getElementById('newOp-form').addEventListener('submit', function (event) {
+
+event.preventDefault();
+
+    const descripcion = document.getElementById('newOp-description').value;
+    const monto = parseFloat(document.getElementById('newOp-amount').value); // Convertir a número
+    const tipo = document.getElementById('newOp-type').value;
+    const categoria = document.getElementById('newOp-category').value;
+    const fecha = document.getElementById('newOp-date').value;
+
+    let tipoGI;
+
+    if (tipo === 'Gasto') {
+        tipoGI = document.getElementById('newOp-gasto').value;
+    } else {
+        tipoGI = document.getElementById('newOp-ingreso').value;
+    }
+
+    if (tipo === 'Nada') {
+        alert('Por favor seleccione un tipo válido.');
+        return;
+    }
+
+    const data = {
+        descripcion,
+        monto,
+        tipo,
+        categoria,
+        fecha,
+        tipoGI
+    };
+
+    fetch('/guardar_operacion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Operación guardada exitosamente.');
+            updateBalance(monto, tipo); // Actualizar balance después de guardar
+            window.location.href = '/balance'; // Redirigir al balance después de guardar
+        } else {
+            alert('Error al guardar la operación.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al guardar la operación.');
+    });
+});
+
+
+document.getElementById('newOp-type').addEventListener('change', function() {
+    
+const tipoSeleccionado = this.value;
+
+// Ocultar ambos selectores de tipo
+document.getElementById('tipoGasto').classList.add('d-none');
+document.getElementById('tipoIngreso').classList.add('d-none');
+
+// Mostrar el selector correspondiente según la selección del usuario
+if (tipoSeleccionado === 'Gasto') {
+    document.getElementById('tipoGasto').classList.remove('d-none');
+} else{
+    document.getElementById('tipoIngreso').classList.remove('d-none');
+}
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+        let totalIngresos = 0;
+        let totalGastos = 0;
+
+        <% ingresos.forEach(function(ingreso) { %>
+            totalIngresos += <%= ingreso.cant_in %>;
+        <% }); %>
+
+        <% gastos.forEach(function(gasto) { %>
+            totalGastos += <%= gasto.cant_g %>;
+        <% }); %>
+
+        updateBalanceDisplay(totalIngresos, totalGastos);
+    });
+
+function updateBalance(monto, tipo) {
+    let totalIngresos = parseFloat(document.getElementById('gain-counter').querySelector('span').innerText);
+    let totalGastos = parseFloat(document.getElementById('loss-counter').querySelector('span').innerText);
+
+    if (tipo === 'Ingreso') {
+        totalIngresos += monto;
+    } else if (tipo === 'Gasto') {
+        totalGastos += monto;
+    }
+
+    updateBalanceDisplay(totalIngresos, totalGastos);
+}
+
+function updateBalanceDisplay(totalIngresos, totalGastos) {
+    document.getElementById('gain-counter').querySelector('span').innerText = totalIngresos.toFixed(2);
+    document.getElementById('loss-counter').querySelector('span').innerText = totalGastos.toFixed(2);
+    document.getElementById('final-amount').querySelector('span').innerText = (totalIngresos - totalGastos).toFixed(2);
+}
+
+</script>
+
+</body>
+
+</html>

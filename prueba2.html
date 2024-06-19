@@ -1,0 +1,97 @@
+<script>
+    
+    // Consulta para verificar si el ID pertenece a una operación de gasto
+    const gastoQuery = 'SELECT id_g AS id FROM gastos WHERE id_g = ?';
+
+    // Consulta para verificar si el ID pertenece a una operación de ingreso
+    const ingresoQuery = 'SELECT id_in AS id FROM ingreso WHERE id_in = ?';
+
+    // Ejecutar la consulta para gastos
+    conexion.query(gastoQuery, [id], (error, gastoResults) => {
+        if (error) {
+            console.error('Error al verificar el gasto:', error);
+            return res.json({ success: false, error });
+        }
+
+        // Si la operación es un gasto
+        if (gastoResults.length > 0) {
+            const originalType = 'Gasto'; // Tipo original es gasto
+
+            // Si el tipo ha cambiado, eliminar de la tabla original y agregar a la nueva tabla
+            if (originalType !== tipo) {
+                conexion.query('DELETE FROM gastos WHERE id_g = ?', [id], (error) => {
+                    if (error) {
+                        console.error('Error al eliminar el gasto:', error);
+                        return res.json({ success: false, error });
+                    }
+
+                    // Agregar a la nueva tabla (ingreso)
+                    conexion.query('INSERT INTO ingreso (cant_in, fecha_in, desc_in, desc_tI, nombre_catG) VALUES (?, ?, ?, ?, ?)', [monto, fecha, descripcion, tipoGI, categoria], (error) => {
+                        if (error) {
+                            console.error('Error al insertar el ingreso:', error);
+                            return res.json({ success: false, error });
+                        }
+                        
+                        res.redirect('/balance');
+                    });
+                });
+            } else {
+                // Si el tipo no ha cambiado, actualizar la operación existente
+                conexion.query('UPDATE gastos SET cant_g = ?, fecha_g = ?, desc_g = ?, desc_tG = ?, nombre_catG = ? WHERE id_g = ?', [monto, fecha, descripcion, tipoGI, categoria, id], (error) => {
+                    if (error) {
+                        console.error('Error al actualizar el gasto:', error);
+                        return res.json({ success: false, error });
+                    }
+                    
+                    res.redirect('/balance');
+                });
+            }
+        } else {
+            // Si no es un gasto, verificar si es un ingreso
+            conexion.query(ingresoQuery, [id], (error, ingresoResults) => {
+                if (error) {
+                    console.error('Error al verificar el ingreso:', error);
+                    return res.json({ success: false, error });
+                }
+
+                // Si la operación es un ingreso
+                if (ingresoResults.length > 0) {
+                    const originalType = 'Ingreso'; // Tipo original es ingreso
+
+                    // Si el tipo ha cambiado, eliminar de la tabla original y agregar a la nueva tabla
+                    if (originalType !== tipo) {
+                        conexion.query('DELETE FROM ingreso WHERE id_in = ?', [id], (error) => {
+                            if (error) {
+                                console.error('Error al eliminar el ingreso:', error);
+                                return res.json({ success: false, error });
+                            }
+
+                            // Agregar a la nueva tabla (gastos)
+                            conexion.query('INSERT INTO gastos (cant_g, fecha_g, desc_g, desc_tG, nombre_catG) VALUES (?, ?, ?, ?, ?)', [monto, fecha, descripcion, tipoGI, categoria], (error) => {
+                                if (error) {
+                                    console.error('Error al insertar el gasto:', error);
+                                    return res.json({ success: false, error });
+                                }
+                                
+                                res.redirect('/balance');
+                            });
+                        });
+                    } else {
+                        // Si el tipo no ha cambiado, actualizar la operación existente
+                        conexion.query('UPDATE ingreso SET cant_in = ?, fecha_in = ?, desc_in = ?, desc_tI = ?, nombre_catG = ? WHERE id_in = ?', [monto, fecha, descripcion, tipoGI, categoria, id], (error) => {
+                            if (error) {
+                                console.error('Error al actualizar el ingreso:', error);
+                                return res.json({ success: false, error });
+                            }
+                            
+                            res.redirect('/balance');
+                        });
+                    }
+                } else {
+                    // Si no se encuentra en ninguna tabla, devolver un mensaje de error
+                    return console.log({ success: false, error: 'Operación no encontrada.' });
+                }
+            });
+        }
+    });
+</script>

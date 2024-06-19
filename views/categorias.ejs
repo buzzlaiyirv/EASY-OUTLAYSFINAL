@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Links -->
+    <link rel="stylesheet" href="/cssEasy/style.css">
+    <script src="https://kit.fontawesome.com/1cf0fc1f6f.js" crossorigin="anonymous"></script>
+    <title>EASY OUTLAYS</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark nav-bg">
+        <div class="container-fluid">
+            <i class="fas fa-wallet text-white fs-1 me-2"></i>
+            <a class="navbar-brand text-white fs-1" href="#">EASY OUTLAYS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" aria-current="page" href="/balance"><i
+                                class="fas fa-chart-line me-2"></i>Balance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" href="/categorias"><i
+                                class="fas fa-tag me-2"></i>Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fs-5" href="/reporte"><i
+                                class="fas fa-chart-pie me-2"></i>Reporte</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section>
+        <div class="container col-lg-6 col-11 bg-light border border-3 rounded-3 mt-5 p-4" id="cont-category">
+            <div class="my-3">
+                <h2>Categorias</h2>
+            </div>
+            <div class="my-2 fw-bold">
+                <p>Nombre</p>
+            </div>
+            <form action="" id="newcat-form">
+                <div class="row my-2">
+                    <div class="col-8 col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="input-cat" aria-label="Sizing example input"
+                                aria-describedby="inputGroup-sizing-default">
+                        </div>
+                    </div>
+                    <div class="col-4 col-sm-2 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-bg-color">Agregar</button>
+                    </div>
+                </div>
+            </form>
+            <div id="tipos-cat"></div>
+        </div>
+    </section>
+
+    
+    <!--CODIGO SCRIPT PARA ESTA PÁGINA-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('newcat-form');
+            const input = document.getElementById('input-cat');
+            const categoriesGrid = document.getElementById('tipos-cat');
+    
+            const savedCategories = JSON.parse(localStorage.getItem('categories')) || [];
+             savedCategories.forEach(categoryName => {
+             addCategoryToUI(categoryName);
+            });
+    
+            // Función para agregar una categoría al UI y al almacenamiento local
+            function addCategoryToUI(categoryName) {
+                const categoryItem = document.createElement('div');
+                categoryItem.classList.add('category-item');
+                categoryItem.innerHTML = `
+                    <div class="row my-2">
+                        <div class="col-8 col-sm-10">
+                            <span class="category-name">${categoryName}</span>
+                        </div>
+                        <div class="col-4 col-sm-2 d-flex justify-content-end">
+                            <span class="btn btn-primary btn-sm me-2 edit-btn">Editar</span>
+                            <span class="btn btn-danger btn-sm delete-btn">Borrar</span>
+                        </div>
+                    </div>
+                `;
+                categoriesGrid.appendChild(categoryItem);
+            }
+    
+            // Función para eliminar una categoría del almacenamiento local
+            function eliminarCategoriaLocalStorage(categoryName) {
+                let categories = JSON.parse(localStorage.getItem('categories')) || [];
+                categories = categories.filter(category => category !== categoryName);
+                localStorage.setItem('categories', JSON.stringify(categories));
+            }
+    
+            // Agregar evento de envío del formulario
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const categoryName = input.value.trim();
+                if (categoryName !== '') {
+                    // Guardar la categoría en la base de datos
+                    fetch('/guardar_categoria', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ categoryName })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Agregar la categoría al UI y al almacenamiento local
+                        addCategoryToUI(data.categoryName);
+                        GuardarCat(data.categoryName);
+                        input.value = '';
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+    
+
+
+
+            // Agregar evento click al grid de categorías
+            categoriesGrid.addEventListener('click', function (event) {
+                if (event.target.classList.contains('delete-btn')) {
+
+
+                    const categoryItem = event.target.closest('.category-item');
+                const categoryNameToDelete = categoryItem.querySelector('.category-name').textContent;
+
+                // Eliminar la categoría de la base de datos
+                fetch('/eliminar_categoria', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ categoryName: categoryNameToDelete })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Eliminar la categoría del DOM
+                        categoryItem.remove();
+                        // Eliminar la categoría del almacenamiento local
+                        eliminarCategoriaLocalStorage(categoryNameToDelete);
+                    } else {
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+                
+                } else if (event.target.classList.contains('edit-btn')) {
+                    // Obtener el nombre de la categoría a editar
+                    const categorySpan = event.target.closest('.category-item').querySelector('.category-name');
+                    const categoryNameToEdit = categorySpan.textContent;
+                    // Convertir el texto en un input editable
+                    categorySpan.outerHTML = `<input type="text" class="form-control edit-input" value="${categoryNameToEdit}">`;
+                    const editInput = event.target.closest('.category-item').querySelector('.edit-input');
+                    editInput.focus();
+    
+                    // Manejar el cambio de categoría
+                    editInput.addEventListener('blur', function () {
+                        const newCategoryName = editInput.value.trim();
+                        if (newCategoryName && newCategoryName !== categoryNameToEdit) {
+                            // Actualizar la categoría en la base de datos
+                            fetch('/actualizar_categoria', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ oldCategoryName: categoryNameToEdit, newCategoryName: newCategoryName })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Actualizar el UI y el almacenamiento local
+                                    editInput.outerHTML = `<span class="category-name">${newCategoryName}</span>`;
+                                    actualizarCategoriaLocalStorage(categoryNameToEdit, newCategoryName);
+                                } else {
+                                    console.error('Error:', data.error);
+                                    editInput.outerHTML = `<span class="category-name">${categoryNameToEdit}</span>`;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                editInput.outerHTML = `<span class="category-name">${categoryNameToEdit}</span>`;
+                            });
+                        } else {
+                            editInput.outerHTML = `<span class="category-name">${categoryNameToEdit}</span>`;
+                        }
+                    });
+    
+                    editInput.addEventListener('keypress', function (event) {
+                        if (event.key === 'Enter') {
+                            editInput.blur();
+                        }
+                    });
+                }
+            });
+    
+            // Función para guardar categorías en el almacenamiento local
+            function GuardarCat(categoryName) {
+                let categories = JSON.parse(localStorage.getItem('categories')) || [];
+                categories.push(categoryName);
+                localStorage.setItem('categories', JSON.stringify(categories));
+            }
+    
+            // Función para actualizar una categoría en el almacenamiento local
+            function actualizarCategoriaLocalStorage(oldCategoryName, newCategoryName) {
+                let categories = JSON.parse(localStorage.getItem('categories')) || [];
+                const categoryIndex = categories.indexOf(oldCategoryName);
+                if (categoryIndex !== -1) {
+                    categories[categoryIndex] = newCategoryName;
+                    localStorage.setItem('categories', JSON.stringify(categories));
+                }
+            }
+    
+            // Evento que limita la longitud del valor de input-cat a 20 caracteres
+            input.addEventListener('input', function() {
+                if (this.value.length > 20) {
+                    this.value = this.value.slice(0, 20);
+                }
+            });
+        });
+    </script>
+    </body>
+
+</html>

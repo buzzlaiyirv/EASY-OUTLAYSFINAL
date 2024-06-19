@@ -1,0 +1,39 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+        background-image: linear-gradient(
+        rgba(222, 238, 222, 0.7),
+         rgba(68, 102, 75, 0.9)),
+        url(img/FONDO\ INFO.png);
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+
+}
+
+a {
+    text-decoration: none;
+}
+
+.nav-bg{
+    background-image: linear-gradient(
+        rgba(35, 54, 34, 0.9),
+        rgba(4, 77, 68, 0.8)),
+            url(img/3769238.jpg);
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+
+}
+
+.btn-bg-color{
+    background-color: #8C61D6;
+    color:white
+    
+}
