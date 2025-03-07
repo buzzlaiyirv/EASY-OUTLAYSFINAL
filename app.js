@@ -6,7 +6,7 @@ let conexion = mysql2.createConnection({
     host : "localhost",
     database : "easy2",
     user : "root",
-    password : "WntMMW_Not22"
+    password : "270406"
 })
 
 
